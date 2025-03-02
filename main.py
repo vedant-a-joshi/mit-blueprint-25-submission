@@ -10,6 +10,8 @@ blue = (0, 0, 255)
 screenWidth = 640
 screenHeight = 480
 
+touching = [[0,-1],[1,0],[0,1],[-1,0]]
+
 itcolor = black
 runcolor = white
 player1It = False
@@ -144,11 +146,30 @@ class Game(object):
         mapArr = mapData.split("\n")
         for i in range(15):
             for j in range(20):
-                if (mapArr[i + 1][j] == 'W'):
-                    newWall = Wall(j * 32, i * 32, 32, 32, "walls/sprite_15.png")
+                if (mapArr[i][j] == 'W'):
+                    count = 0
+                    for k in range(4):
+                        newXPos = i + touching[k][0]
+                        newYPos = j + touching[k][1]
+                        try:
+                            if mapArr[newXPos][newYPos] != 'W':
+                                count += 2 ** k
+                        except:
+                            count += 2 ** k
+                    print(f"({i},{j})=>{count}")
+                    newWall = Wall(j * 32, i * 32, 32, 32, f"walls/sprite_{count:02d}.png")
                     self.wallList.add(newWall)
-                elif (mapArr[i + 1][j] == ' '):
-                    newGrass = Wall(j * 32, i * 32, 32, 32, "grass/sprite_15.png")
+                elif (mapArr[i][j] == ' '):
+                    count = 0
+                    for k in range(4):
+                        newXPos = i + touching[k][0]
+                        newYPos = j + touching[k][1]
+                        try:
+                            if mapArr[newXPos][newYPos] != ' ':
+                                count += 2 ** k
+                        except:
+                            count += 2 ** k
+                    newGrass = Wall(j * 32, i * 32, 32, 32, f"grass/sprite_{count:02d}.png")
                     self.decoList.add(newGrass)
 
 
@@ -175,23 +196,21 @@ def main():
     game = Game(player1, player2)
     
     levels = [
-        """
-WWWWWWWWWWWWWWWWWWWW
+        """WWWWWWWWWWWWWWWWWWWW
 W                  W
 W  W W             W
 W  W W             W
+W  W WWW           W
 W  W               W
-W  W               W
+W  WWWWWW          W
 W                  W
 W                  W
 W                  W
+W          WWWWWWW W
+W          WWWWWWW W
+W          WWWWWWW W
 W                  W
-W                  W
-W                  W
-W                  W
-W                  W
-WWWWWWWWWWWWWWWWWWWW
-        """
+WWWWWWWWWWWWWWWWWWWW"""
     ]
 
     game.loadMap(levels[0])
