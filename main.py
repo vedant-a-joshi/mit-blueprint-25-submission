@@ -24,7 +24,7 @@ else:
     player1It = False
 
 # speed = int(input(print("input speed: ")))
-speed = 6
+speed = 4
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, image1str, image2str, isIt = False):
@@ -223,50 +223,74 @@ WWWWWWWWWWWWWWWWWWWW
         
         # screen.blit(bg, (0, 0))
 
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.QUIT:
-                done = True
+        # events = pygame.event.get()
+        # for event in events:
+        #     if event.type == pygame.QUIT:
+        #         done = True
                 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_x:
-                    levelOne.loadMap()
-                if event.key == pygame.K_LEFT:
-                    player1.goLeft()
-                if event.key == pygame.K_RIGHT:
-                    player1.goRight()
-                if event.key == pygame.K_UP:
-                    player1.goUp()
-                if event.key == pygame.K_DOWN:
-                    player1.goDown()
+        #     if event.type == pygame.KEYDOWN:
+        #         if event.key == pygame.K_x:
+        #             levelOne.loadMap()
+                
+        #         if event.key == pygame.K_LEFT:
+        #             player1.goLeft()
+        #         elif event.key == pygame.K_RIGHT:
+        #             player1.goRight()
+        #         if event.key == pygame.K_UP:
+        #             player1.goUp()
+        #         elif event.key == pygame.K_DOWN:
+        #             player1.goDown()
                     
-                if event.key == pygame.K_a:
-                    player2.goLeft()
-                if event.key == pygame.K_d:
-                    player2.goRight()
-                if event.key == pygame.K_w:
-                    player2.goUp()
-                if event.key == pygame.K_s:
-                    player2.goDown()
+        #         if event.key == pygame.K_a:
+        #             player2.goLeft()
+        #         elif event.key == pygame.K_d:
+        #             player2.goRight()
+        #         if event.key == pygame.K_w:
+        #             player2.goUp()
+        #         elif event.key == pygame.K_s:
+        #             player2.goDown()
             
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT:
-                    player1.stopHorizontal()
-                if event.key == pygame.K_RIGHT:  
-                    player1.stopHorizontal()
-                if event.key == pygame.K_UP:
-                    player1.stopVertical()
-                if event.key == pygame.K_DOWN:
-                    player1.stopVertical()
+        #     if event.type == pygame.KEYUP:
+        #         if event.key == pygame.K_LEFT:
+        #             player1.stopHorizontal()
+        #         if event.key == pygame.K_RIGHT:  
+        #             player1.stopHorizontal()
+        #         if event.key == pygame.K_UP:
+        #             player1.stopVertical()
+        #         if event.key == pygame.K_DOWN:
+        #             player1.stopVertical()
                 
-                if event.key == pygame.K_a:
-                    player2.stopHorizontal()
-                if event.key == pygame.K_d:  
-                    player2.stopHorizontal()
-                if event.key == pygame.K_w:
-                    player2.stopVertical()
-                if event.key == pygame.K_s:
-                    player2.stopVertical()
+        #         if event.key == pygame.K_a:
+        #             player2.stopHorizontal()
+        #         if event.key == pygame.K_d:  
+        #             player2.stopHorizontal()
+        #         if event.key == pygame.K_w:
+        #             player2.stopVertical()
+        #         if event.key == pygame.K_s:
+        #             player2.stopVertical()
+
+        player1.changeX = 0
+        player1.changeY = 0
+        player2.changeX = 0
+        player2.changeY = 0
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            player1.goLeft()
+        if keys[pygame.K_RIGHT]:
+            player1.goRight()
+        if keys[pygame.K_DOWN]:
+            player1.goDown()
+        if keys[pygame.K_UP]:
+            player1.goUp()
+        
+        if keys[pygame.K_a]:
+            player2.goLeft()
+        if keys[pygame.K_d]:
+            player2.goRight()
+        if keys[pygame.K_s]:
+            player2.goDown()
+        if keys[pygame.K_w]:
+            player2.goUp()
         
         pygame.event.pump()
         
