@@ -23,11 +23,19 @@ class Player(pygame.sprite.Sprite):
         
         self.changeX = 0
         self.changeY = 0
+
+        self.gravity = 0
         
         self.level = None
+    
+    def isOnGround(self):
+        blockHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
+        for block in blockHitList:
+            if self.rect.y + self.rect.h > block.rect.y:
+                return True
+        return False
         
     def update(self):
-        
         # self.calcGrav()
         self.rect.x += self.changeX
         self.rect.y += self.changeY
@@ -50,22 +58,16 @@ class Player(pygame.sprite.Sprite):
             self.change = 0
     
     def calcGrav(self):
-        if self.changeY == 0:
-            self.changeY = 1
-        else:
-            self.changeY += 0.35
+        if not self.isOnGround():
+            self.yveloc += 0.1
+
     
         if self.rect.y >= screenHeight - self.rect.height and self.changeY >= 0:
             self.changeY = 0
             self.rect.y = screenHeight - self.rect.height
         
     def goUp(self):
-        # self.rect.y += 2
-        # platformHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
-        # self.rect.y -= 2
-        
-        # if len(platformHitList) > 0 or self.rect.bottom >= screenHeight:
-        #     self.changeY -= 10
+        self.calcGrav(self)
         self.changeY -= 6
     
     def goDown(self):
@@ -78,7 +80,6 @@ class Player(pygame.sprite.Sprite):
         self.changeX += 6
     
     def stop(self):
-        self.changeY = 0
         self.changeX = 0
         
 class Platform(pygame.sprite.Sprite):
@@ -168,18 +169,16 @@ def main():
                     player.goRight()
                 if event.key == pygame.K_UP:
                     player.goUp()
-                if event.key == pygame.K_DOWN:
-                    player.goDown()
             
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT and player.changeX < 0:
                     player.stop()
                 if event.key == pygame.K_RIGHT and player.changeX > 0:
                     player.stop()
-                if event.key == pygame.K_UP and player.changeY < 0:
-                    player.stop()
-                if event.key == pygame.K_DOWN and player.changeY > 0:
-                    player.stop()
+                # if event.key == pygame.K_UP and player.changeY < 0:
+                #     player.stop()
+                # if event.key == pygame.K_DOWN and player.changeY > 0:
+                #     player.stop()
         
         activeSpriteList.update()
         currentLevel.update()
