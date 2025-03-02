@@ -1,4 +1,4 @@
-import pygame, random, time
+import pygame, random
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -9,15 +9,17 @@ blue = (0, 0, 255)
 screenWidth = 800
 screenHeight = 600
 
+itcolor = black
+runcolor = white
 player1It = False
 filler = random.randint(0, 1)%2
 if filler == 1:
-    player1Color = black
-    player2Color = white
+    player1Color = itcolor
+    player2Color = runcolor
     player1It = True
 else:
-    player1Color = white
-    player2Color = black
+    player1Color = itcolor
+    player2Color = runcolor
     player1It = False
 
 # speed = int(input(print("input speed: ")))
@@ -186,13 +188,12 @@ def main():
     player1.rect.y = screenHeight - player1.rect.height
     activeSpriteList.add(player1)
     
-    time.sleep(5)
-    
-    player2.rect.x = 80
+    player2.rect.x = 200
     player2.rect.y = screenWidth - player2.rect.width
     activeSpriteList.add(player2)
     
     done = False
+    collisionOccurred = False
     
     clock = pygame.time.Clock()
     pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
@@ -266,27 +267,30 @@ def main():
             player2.rect.bottom = screenHeight
         if player2.rect.top < 0:
             player2.rect.top = 0
+            
+        
         
         # other drawing code below
         currentLevel.draw(screen)
         activeSpriteList.draw(screen)
-        if (player1.rect.bottom >= player2.rect.top or 
-            player1.rect.top <= player2.rect.bottom or 
-            player1.rect.right >= player2.rect.left or
-            player1.rect.left <= player2.rect.right):
-            player1It = not player1It
         
-        if player1It:
-            player1.image.fill(player1Color)
-            player2.image.fill(player2Color)
-        else:
-            player1.image.fill(player2Color)
-            player2.image.fill(player1Color)
+        if player1.rect.colliderect(player2.rect) and not collisionOccurred:
+            if player1It:
+                player1It = False
+                player1.image.fill(runcolor)
+                player2.image.fill(itcolor)
+            else:
+                player1It = True
+                player1.image.fill(itcolor)
+                player2.image.fill(runcolor)
+            
+            collisionOccurred = True
+        elif not player1.rect.colliderect(player2.rect):
+            collisionOccurred = False
         
         # drawing code shd be above
         
         clock.tick(60)
-        
         pygame.display.flip()
         
     pygame.quit()
