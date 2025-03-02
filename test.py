@@ -9,7 +9,8 @@ blue = (0, 0, 255)
 screenWidth = 800
 screenHeight = 600
 
-speed = int(input(print("input speed: ")))
+# speed = int(input(print("input speed: ")))
+speed = 6
 
 class Player(pygame.sprite.Sprite):
     
@@ -40,6 +41,8 @@ class Player(pygame.sprite.Sprite):
                 self.rect.right = block.rect.left
             elif self.changeX < 0:
                 self.rect.left = block.rect.right
+                
+            self.changeX = 0
         
         self.rect.y += self.changeY
         blockHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
@@ -49,7 +52,7 @@ class Player(pygame.sprite.Sprite):
             elif self.changeY < 0:
                 self.rect.top = block.rect.bottom
             
-            self.change = 0
+            self.changeY = 0
     
     def calcGrav(self):
         if self.changeY == 0:
@@ -127,7 +130,7 @@ class levelOne(Level):
         level = []
         
         for i in range(random.randint(2, 6)):
-            newBlock = [40, 40, random.randint(0, 79) * 10, random.randint(0, 79) * 10]
+            newBlock = [40, 40, random.randint(0, 76) * 10, random.randint(0, 56) * 10]
             level.append(newBlock)
         
         # width, height, x, y
@@ -169,8 +172,8 @@ def main():
     player1.rect.y = screenHeight - player1.rect.height
     activeSpriteList.add(player1)
     
-    player2.rect.x = 20
-    player2.rect.y = screenWidth - player2.rect.height
+    player2.rect.x = 80
+    player2.rect.y = screenWidth - player2.rect.width
     activeSpriteList.add(player2)
     
     done = False
@@ -215,16 +218,18 @@ def main():
                     player1.stopVertical()
                 
                 if event.key == pygame.K_a:
-                    player1.stopHorizontal()
+                    player2.stopHorizontal()
                 if event.key == pygame.K_d:  
-                    player1.stopHorizontal()
+                    player2.stopHorizontal()
                 if event.key == pygame.K_w:
-                    player1.stopVertical()
+                    player2.stopVertical()
                 if event.key == pygame.K_s:
-                    player1.stopVertical()
+                    player2.stopVertical()
         
         pygame.event.pump()
         
+        player1.update()
+        player2.update()
         activeSpriteList.update()
         currentLevel.update()
         
