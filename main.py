@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, sys
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -249,6 +249,9 @@ def main():
     size = [screenWidth, screenHeight]
     screen = pygame.display.set_mode(size)
     screen.set_alpha(None)
+
+    bg = pygame.image.load("rieverbg.png")
+    bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
     
     pygame.display.set_caption("Tag")
     
@@ -281,6 +284,8 @@ def main():
     
     while not done:
         
+        screen.blit(bg, (0, 0))
+
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
