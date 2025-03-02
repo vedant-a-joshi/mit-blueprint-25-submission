@@ -337,7 +337,7 @@ WWWWWWWWWWWWWWWWWWWW"""),
             pygame.event.pump()
             clock.tick(30)
             pygame.display.flip()
-                
+        ctime = 0
         while (player1Score < FIRST_TO and player2Score < FIRST_TO):
             randomiseTeams()
             updateSprites(player1, player2)
@@ -360,6 +360,15 @@ WWWWWWWWWWWWWWWWWWWW"""),
             player2.rect.y = chosen_map.player2_ypos * 32 + 120
             textbg = Wall(0, 0, 640, 120, "scoreboard.png")
             game.decoList.add(textbg)
+            while ctime < 3 * 1000:
+                ctime += clock.get_time()
+                timetext = font4.render(f"{ctime}", False, (0, 0, 255))
+                timerect = timetext.get_rect(center=(320, 300))
+
+                screen.blit(timetext, timerect)
+
+
+            ctime = 0
             while (ctime < TIME_LIMIT):
 
                 ctime += clock.get_time()
