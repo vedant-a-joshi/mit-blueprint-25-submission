@@ -188,7 +188,7 @@ class Game(object):
 def main():
     FIRST_TO = 3
     pygame.font.init()
-    font = pygame.font.Font("m6x11.ttf", 40)
+    font = pygame.font.Font("m6x11.ttf", 35)
     font2 = pygame.font.Font("m6x11.ttf", 60)
     global player1It
     global player1Color
@@ -275,7 +275,7 @@ WWWWWWWWWWWWWWWWWWWW"""),
         player1.rect.y = chosen_map.player1_ypos * 32 + 120
         player2.rect.x = chosen_map.player2_xpos * 32
         player2.rect.y = chosen_map.player2_ypos * 32 + 120
-        textbg = Wall(0, 0, 640, 120, f"walls/sprite_15.png")
+        textbg = Wall(0, 0, 640, 120, f"scoreboard.png")
         game.decoList.add(textbg)
         while (not done and ctime < 30000):
 
@@ -364,14 +364,16 @@ WWWWWWWWWWWWWWWWWWWW"""),
             clock.tick(60)
 
             ntime = 30000 - ctime
+            if (ntime < 0):
+                ntime = 0
             sec = ntime // 1000
             ms = ntime % 1000
             time_counter = font.render(f"Time remaining: {sec}.{ms:03d}", False, (255, 255, 255))
-            tc_rect = time_counter.get_rect(center=(320, 30))
+            tc_rect = time_counter.get_rect(center=(320, 25))
             p1score = font2.render(f"{player1Score}", False, (255, 0, 0))
-            p1s_rect = p1score.get_rect(midright=(300,80))
+            p1s_rect = p1score.get_rect(center=(252, 85))
             p2score = font2.render(f"{player2Score}", False, (0, 0, 255))
-            p2s_rect = p1score.get_rect(midleft=(340,80))
+            p2s_rect = p1score.get_rect(midleft=(380, 85))
 
             screen.blit(time_counter, tc_rect)
             screen.blit(p1score, p1s_rect)
