@@ -1,4 +1,4 @@
-import pygame, random, sys
+import pygame, random, sys, time
 from interruptingcow import timeout
 
 black = (0, 0, 0)
@@ -53,7 +53,7 @@ class Player(pygame.sprite.Sprite):
         # self.calcGrav()
         
         self.rect.x += self.changeX
-        blockHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
+        blockHitList = pygame.sprite.spritecollide(self, self.level.wallList, False)
         for block in blockHitList:
             if self.changeX > 0:
                 self.rect.right = block.rect.left
@@ -63,7 +63,7 @@ class Player(pygame.sprite.Sprite):
             self.changeX = 0
         
         self.rect.y += self.changeY
-        blockHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
+        blockHitList = pygame.sprite.spritecollide(self, self.level.wallList, False)
         for block in blockHitList:
             if self.changeY > 0:
                 self.rect.bottom = block.rect.top
@@ -110,59 +110,47 @@ class Player(pygame.sprite.Sprite):
     #     self.changeY = 0
     #     self.changeX = 0
 
-class Platform(pygame.sprite.Sprite):
+class Wall(pygame.sprite.Sprite):
     
-    def __init__(self, width, height):
+    def __init__(self, xpos, ypos, width, height, image):
         super().__init__()
         
-        self.image = pygame.Surface([width, height])
-        self.image.fill(green)
-        
+        self.image = pygame.image.load(image)
+        self.image = pygame.transform.scale(self.image, (32, 32))
         self.rect = self.image.get_rect()
+        self.rect.x = xpos
+        self.rect.y = ypos
     
 
-class Level(object):
-    
-    def __init__(self, player):
-        self.platformList = pygame.sprite.Group()
-        self.player = player
-        
-        self.background = None
-        
-    def update(self):
-        self.platformList.update()
-        
-    def draw(self, screen):
-        # screen.fill(blue)
-        self.platformList.draw(screen)
-    
-    def loadMap(self, mapData):
-        for i in self.platformList:
-            i.kill()
-        # for i in mapData:
-        #     for j in i:
-        #         if (j == 'W'):
-
-        
-class levelOne(Level):
+class Game(object):
     
     def __init__(self, player1, player2):
+        self.wallList = pygame.sprite.Group()
+        self.decoList = pygame.sprite.Group()
+        self.player1 = player1
+        self.player2 = player2
+            
+    def update(self):
+        self.wallList.update()
+        self.decoList.update()
         
-        Level.__init__(self, player1)
-        Level.__init__(self, player2)
+    def draw(self, screen):
+        self.wallList.draw(screen)
+        self.decoList.draw(screen)
+    
+    def loadMap(self, mapData):
+        for i in self.wallList:
+            i.kill()
+        mapArr = mapData.split("\n")
+        for i in range(15):
+            for j in range(20):
+                if (mapArr[i + 1][j] == 'W'):
+                    newWall = Wall(j * 32, i * 32, 32, 32, "walls/sprite_15.png")
+                    self.wallList.add(newWall)
+                elif (mapArr[i + 1][j] == ' '):
+                    newGrass = Wall(j * 32, i * 32, 32, 32, "grass/sprite_15.png")
+                    self.decoList.add(newGrass)
 
-        level = []
-        
-        for i in range(random.randint(2, 6)):
-            newBlock = [32, 32, random.randint(0, 19) * 32, random.randint(0, 14) * 32]
-            level.append(newBlock)
-        
-        for platform in level:
-            block = Platform(platform[0], platform[1])
-            block.rect.x = platform[2]
-            block.rect.y = platform[3]
-            block.player = self.player
-            self.platformList.add(block)
 
 def main():
 
@@ -175,30 +163,52 @@ def main():
     screen = pygame.display.set_mode(size)
     screen.set_alpha(None)
 
-    bg = pygame.image.load("river.png")
-    bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
+    # bg = pygame.image.load("river.png")
+    # bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
+
     
     pygame.display.set_caption("Tag")
     
     player1 = Player("Player1It.png", "Player1NotIt.png", isIt = player1It)
     player2 = Player("Player2It.png", "Player2NotIt.png", isIt = not player1It)
+
+    game = Game(player1, player2)
     
-    levelList = []
-    levelList.append(levelOne(player1, player2))
-    
-    currentLevelNumber = 0
-    currentLevel = levelList[currentLevelNumber]
+    levels = [
+        """
+WWWWWWWWWWWWWWWWWWWW
+W                  W
+W  W W             W
+W  W W             W
+W  W               W
+W  W               W
+W                  W
+W                  W
+W                  W
+W                  W
+W                  W
+W                  W
+W                  W
+W                  W
+WWWWWWWWWWWWWWWWWWWW
+        """
+    ]
+
+    game.loadMap(levels[0])
+
+    # currentLevelNumber = 0
+    # currentLevel = levelList[currentLevelNumber]
     
     activeSpriteList = pygame.sprite.Group()
-    player1.level = currentLevel
-    player2.level = currentLevel
+    player1.level = game
+    player2.level = game
     
     player1.rect.x = 80
-    player1.rect.y = screenHeight - player1.rect.height
+    player1.rect.y = 80
     activeSpriteList.add(player1)
     
-    player2.rect.x = 200
-    player2.rect.y = screenWidth - player2.rect.width
+    player2.rect.x = 400
+    player2.rect.y = 400
     activeSpriteList.add(player2)
     
     done = False
@@ -211,7 +221,7 @@ def main():
     
     while (not done or time.time() < timeout + timeoutStart):
         
-        screen.blit(bg, (0, 0))
+        # screen.blit(bg, (0, 0))
 
         events = pygame.event.get()
         for event in events:
@@ -263,7 +273,8 @@ def main():
         # player1.update()
         # player2.update()
         activeSpriteList.update()
-        currentLevel.update()
+        # currentLevel.update()
+        game.update()
         
         if player1.rect.right > screenWidth:
             player1.rect.right = screenWidth
@@ -284,7 +295,7 @@ def main():
             player2.rect.top = 0
         
         # other drawing code below
-        currentLevel.draw(screen)
+        game.draw(screen)
         activeSpriteList.draw(screen)
         
         if player1.rect.colliderect(player2.rect) and not collisionOccurred:
@@ -309,7 +320,7 @@ def main():
         
         clock.tick(60)
         pygame.display.flip()
-        print(clock)
+        # print(clock)
         
     pygame.quit()
 
