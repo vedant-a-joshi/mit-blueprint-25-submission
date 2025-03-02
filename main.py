@@ -287,6 +287,22 @@ W     W      W     W
 W                  W
 W                  W
 WWWWWWWWWWWWWWWWWWWW"""),
+    GameMap(1, 1, 18, 13,
+"""WWWWWWWWWWWWWWWWWWWW
+W                  W
+W           W      W
+W         W        W
+W       W          W
+W     W            W
+W   W              W
+W                  W
+W             W    W
+W            W     W
+W           W      W
+W          W       W
+W         W        W
+W                  W
+WWWWWWWWWWWWWWWWWWWW"""),
     ]
 
     # currentLevelNumber = 0
