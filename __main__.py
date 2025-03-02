@@ -223,8 +223,8 @@ def main():
 
     crash_sound = pygame.mixer.Sound("get.mp3")
 
-    # pygame.mixer.music.load("bgm.mp3")
-    # pygame.mixer.music.play(-1)
+    pygame.mixer.music.load("bgm.mp3")
+    pygame.mixer.music.play(-1)
     
     size = [screenWidth, screenHeight]
     screen = pygame.display.set_mode(size)
