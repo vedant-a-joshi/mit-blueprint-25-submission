@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -8,6 +8,8 @@ blue = (0, 0, 255)
 
 screenWidth = 800
 screenHeight = 600
+
+speed = int(input(print("input speed: ")))
 
 class Player(pygame.sprite.Sprite):
     
@@ -66,20 +68,26 @@ class Player(pygame.sprite.Sprite):
         
         # if len(platformHitList) > 0 or self.rect.bottom >= screenHeight:
         #     self.changeY -= 10
-        self.changeY -= 6
+        self.changeY -= speed
     
     def goDown(self):
-        self.changeY += 6
+        self.changeY += speed
     
     def goLeft(self):
-        self.changeX -= 6
+        self.changeX -= speed
     
     def goRight(self):
-        self.changeX += 6
+        self.changeX += speed
     
-    def stop(self):
-        self.changeY = 0
+    def stopHorizontal(self):
         self.changeX = 0
+    
+    def stopVertical(self):
+        self.changeY = 0
+        
+    # def stop(self):
+    #     self.changeY = 0
+    #     self.changeX = 0
         
 class Platform(pygame.sprite.Sprite):
     
@@ -112,15 +120,21 @@ class Level(object):
         
 class levelOne(Level):
     
-    def __init__(self, player):
+    def __init__(self, player1, player2):
         
-        Level.__init__(self, player)
+        Level.__init__(self, player1)
+        
+        level = []
+        
+        for i in range(random.randint(2, 6)):
+            newBlock = [40, 40, random.randint(0, 79) * 10, random.randint(0, 79) * 10]
+            level.append(newBlock)
         
         # width, height, x, y
-        level = [[210, 70, 500, 500],
-                 [210, 70, 200, 400],
-                 [210, 70, 600, 300],
-                 ]
+        # level = [[30, 30, random.randint(0, 79) * 10, random.randint(0, 79) * 10],
+        #          [210, 70, 200, 400],
+        #          [210, 70, 600, 300],
+        #          ]
         
         for platform in level:
             block = Platform(platform[0], platform[1])
@@ -134,64 +148,94 @@ def main():
     
     size = [screenWidth, screenHeight]
     screen = pygame.display.set_mode(size)
+    screen.set_alpha(None)
     
-    pygame.display.set_caption("Game")
+    pygame.display.set_caption("Tag")
     
-    player = Player()
+    player1 = Player()
+    player2 = Player()
     
     levelList = []
-    levelList.append(levelOne(player))
+    levelList.append(levelOne(player1, player2))
     
     currentLevelNumber = 0
     currentLevel = levelList[currentLevelNumber]
     
     activeSpriteList = pygame.sprite.Group()
-    player.level = currentLevel
+    player1.level = currentLevel
+    player2.level = currentLevel
     
-    player.rect.x = 80
-    player.rect.y = screenHeight - player.rect.height
-    activeSpriteList.add(player)
+    player1.rect.x = 80
+    player1.rect.y = screenHeight - player1.rect.height
+    activeSpriteList.add(player1)
+    
+    player2.rect.x = 20
+    player2.rect.y = screenWidth - player2.rect.height
+    activeSpriteList.add(player2)
     
     done = False
     
     clock = pygame.time.Clock()
+    pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
     
     while not done:
-        for event in pygame.event.get():
+        
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 done = True
-            
+                
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    player.goLeft()
+                    player1.goLeft()
                 if event.key == pygame.K_RIGHT:
-                    player.goRight()
+                    player1.goRight()
                 if event.key == pygame.K_UP:
-                    player.goUp()
+                    player1.goUp()
                 if event.key == pygame.K_DOWN:
-                    player.goDown()
+                    player1.goDown()
+                    
+                if event.key == pygame.K_a:
+                    player2.goLeft()
+                if event.key == pygame.K_d:
+                    player2.goRight()
+                if event.key == pygame.K_w:
+                    player2.goUp()
+                if event.key == pygame.K_s:
+                    player2.goDown()
             
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT and player.changeX < 0:
-                    player.stop()
-                if event.key == pygame.K_RIGHT and player.changeX > 0:
-                    player.stop()
-                if event.key == pygame.K_UP and player.changeY < 0:
-                    player.stop()
-                if event.key == pygame.K_DOWN and player.changeY > 0:
-                    player.stop()
+                if event.key == pygame.K_LEFT:
+                    player1.stopHorizontal()
+                if event.key == pygame.K_RIGHT:  
+                    player1.stopHorizontal()
+                if event.key == pygame.K_UP:
+                    player1.stopVertical()
+                if event.key == pygame.K_DOWN:
+                    player1.stopVertical()
+                
+                if event.key == pygame.K_a:
+                    player1.stopHorizontal()
+                if event.key == pygame.K_d:  
+                    player1.stopHorizontal()
+                if event.key == pygame.K_w:
+                    player1.stopVertical()
+                if event.key == pygame.K_s:
+                    player1.stopVertical()
+        
+        pygame.event.pump()
         
         activeSpriteList.update()
         currentLevel.update()
         
-        if player.rect.right > screenWidth:
-            player.rect.right = screenWidth
-        if player.rect.left < 0:
-            player.rect.left = 0
-        if player.rect.bottom > screenHeight:
-            player.rect.bottom = screenHeight
-        if player.rect.top < 0:
-            player.rect.top = 0
+        if player1.rect.right > screenWidth:
+            player1.rect.right = screenWidth
+        if player1.rect.left < 0:
+            player1.rect.left = 0
+        if player1.rect.bottom > screenHeight:
+            player1.rect.bottom = screenHeight
+        if player1.rect.top < 0:
+            player1.rect.top = 0
         
         # other drawing code below
         currentLevel.draw(screen)

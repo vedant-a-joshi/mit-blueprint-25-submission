@@ -23,8 +23,6 @@ class Player(pygame.sprite.Sprite):
         
         self.changeX = 0
         self.changeY = 0
-
-        self.gravity = 0
         
         self.level = None
     
@@ -59,13 +57,8 @@ class Player(pygame.sprite.Sprite):
     
     def calcGrav(self):
         if not self.isOnGround():
-            self.yveloc += 0.1
-
-    
-        if self.rect.y >= screenHeight - self.rect.height and self.changeY >= 0:
-            self.changeY = 0
-            self.rect.y = screenHeight - self.rect.height
-        
+            self.changeY += 0.1
+                
     def goUp(self):
         self.calcGrav(self)
         self.changeY -= 6
