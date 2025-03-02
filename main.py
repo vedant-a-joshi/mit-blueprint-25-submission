@@ -185,7 +185,7 @@ class Game(object):
                     self.decoList.add(newGrass)
 
 def updateSprites(player1, player2):
-    if player1It:
+    if not player1It:
         player1.image = pygame.image.load('Player1NotIt.png')
         player2.image = pygame.image.load('Player2It.png')
         player1.speed = 4
@@ -198,7 +198,7 @@ def updateSprites(player1, player2):
 
 def main():
     FIRST_TO = 3
-    TIME_LIMIT = 3 * 1000
+    TIME_LIMIT = 30 * 1000
 
     pygame.font.init()
     font = pygame.font.Font("m6x11.ttf", 35)
@@ -211,6 +211,11 @@ def main():
     global player1Score
     global player2Score
     pygame.init()
+
+    crash_sound = pygame.mixer.Sound("get.mp3")
+
+    pygame.mixer.music.load("bgm.mp3")
+    pygame.mixer.music.play(-1)
     
     size = [screenWidth, screenHeight]
     screen = pygame.display.set_mode(size)
@@ -419,7 +424,8 @@ WWWWWWWWWWWWWWWWWWWW"""),
                 activeSpriteList.draw(screen)
                 
                 if player1.rect.colliderect(player2.rect) and not collisionOccurred:
-                    updateSprites()
+                    updateSprites(player1, player2)
+                    crash_sound.play()
                     
                     collisionOccurred = True
                 elif not player1.rect.colliderect(player2.rect):
