@@ -1,4 +1,5 @@
 import pygame, random, sys
+from interruptingcow from timeout
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -6,8 +7,8 @@ red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
 
-screenWidth = 800
-screenHeight = 600
+screenWidth = 640
+screenHeight = 480
 
 itcolor = black
 runcolor = white
@@ -124,20 +125,16 @@ class Level(object):
     
     def __init__(self, player):
         self.platformList = pygame.sprite.Group()
-        self.enemyList = pygame.sprite.Group()
         self.player = player
         
         self.background = None
         
     def update(self):
         self.platformList.update()
-        self.enemyList.update()
         
     def draw(self, screen):
-        screen.fill(blue)
-        
+        # screen.fill(blue)
         self.platformList.draw(screen)
-        self.enemyList.draw(screen)
     
     def loadMap(self, mapData):
         for i in self.platformList:
@@ -157,7 +154,7 @@ class levelOne(Level):
         level = []
         
         for i in range(random.randint(2, 6)):
-            newBlock = [40, 40, random.randint(0, 76) * 10, random.randint(0, 56) * 10]
+            newBlock = [32, 32, random.randint(0, 19) * 32, random.randint(0, 14) * 32]
             level.append(newBlock)
         
         for platform in level:
@@ -178,7 +175,7 @@ def main():
     screen = pygame.display.set_mode(size)
     screen.set_alpha(None)
 
-    bg = pygame.image.load("Player1It.png")
+    bg = pygame.image.load("river.png")
     bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
     
     pygame.display.set_caption("Tag")
@@ -206,11 +203,13 @@ def main():
     
     done = False
     collisionOccurred = False
+    timeoutStart = time.time()
+    timeout = 5
     
     clock = pygame.time.Clock()
     pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
     
-    while not done:
+    while (not done or time.time() < timeout + timeoutStart):
         
         screen.blit(bg, (0, 0))
 
