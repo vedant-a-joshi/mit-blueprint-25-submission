@@ -100,6 +100,7 @@ class levelOne(Level):
         
         Level.__init__(self, player)
         
+        # width, height, x, y
         level = [[210, 70, 500, 500],
                  [210, 70, 200, 400],
                  [210, 70, 600, 300],
@@ -107,4 +108,73 @@ class levelOne(Level):
         
         for platform in level:
             block = Platform(platform[0], platform[1])
+            block.rect.x = platform[2]
+            block.rect.y = platform[3]
+            block.player = self.player
+            self.platformList.add(block)
+
+def main():
+    pygame.init()
+    
+    size = [screenWidth, screenHeight]
+    screen = pygame.display.set_mode(size)
+    
+    pygame.display.set_caption("Game")
+    
+    player = Player()
+    
+    levelList = []
+    levelList.append(levelOne(player))
+    
+    currentLevelNumber = 0
+    currentLevel = levelList[currentLevelNumber]
+    
+    activeSpriteList = pygame.sprite.Group()
+    player.level = currentLevel
+    
+    player.rect.x = 340
+    player.rect.y = screenHeight - player.rect.height
+    activeSpriteList.add(player)
+    
+    done = False
+    
+    clock = pygame.time.Clock()
+    
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    player.goLeft()
+                if event.key == pygame.K_RIGHT:
+                    player.goRight()
+                if event.key == pygame.K_UP:
+                    player.jump()
+            
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT and player.changeX < 0:
+                    player.stop()
+                if event.key == pygame.K_RIGHT and player.changeX > 0:
+                    player.stop()
+        
+        activeSpriteList.update()
+        currentLevel.update()
+        
+        if player.rect.right > screenWidth:
+            player.rect.right = screenWidth
+        if player.rect.left < 0:
+            player.rect.left = 0
+        
+        # other drawing code below
+        currentLevel.draw(screen)
+        activeSpriteList.draw(screen)
+        # drawing code shd be above
+        
+        clock.tick(60)
+        
+        pygame.display.flip()
+        
+        
         
