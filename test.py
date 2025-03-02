@@ -9,26 +9,29 @@ blue = (0, 0, 255)
 screenWidth = 800
 screenHeight = 600
 
+player1It = False
 filler = random.randint(0, 1)%2
 if filler == 1:
     player1Color = black
     player2Color = white
+    player1It = True
 else:
     player1Color = white
     player2Color = black
+    player1It = False
 
 # speed = int(input(print("input speed: ")))
 speed = 6
 
 class Player(pygame.sprite.Sprite):
     
-    def __init__(self):
+    def __init__(self, color):
         super().__init__()
         
         width = 60
         height = 60
         self.image = pygame.Surface([width, height])
-        self.image.fill(red)
+        self.image.fill(color)
         
         self.rect = self.image.get_rect()
         
@@ -163,8 +166,8 @@ def main():
     
     pygame.display.set_caption("Tag")
     
-    player1 = Player()
-    player2 = Player()
+    player1 = Player(player1Color)
+    player2 = Player(player2Color)
     
     levelList = []
     levelList.append(levelOne(player1, player2))
@@ -262,6 +265,19 @@ def main():
         # other drawing code below
         currentLevel.draw(screen)
         activeSpriteList.draw(screen)
+        if (player1.rect.bottom >= player2.rect.bottom or 
+            player1.rect.top <= player2.rect.bottom or 
+            player1.rect.right >= player2.rect.left or
+            player1.rect.left <= player2.rect.right):
+            player1It = not player1It
+        
+        if player1It:
+            player1.image.fill(player1Color)
+            player2.image.fill(player2Color)
+        else:
+            player1.image.fill(player2Color)
+            player2.image.fill(player1Color)
+        
         # drawing code shd be above
         
         clock.tick(60)

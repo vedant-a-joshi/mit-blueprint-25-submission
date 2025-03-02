@@ -1,5 +1,7 @@
 # webserver testing
 import pygame
+import asyncio
+
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -130,7 +132,7 @@ class levelOne(Level):
             block.player = self.player
             self.platformList.add(block)
 
-def main():
+async def main():
     pygame.init()
     
     size = [screenWidth, screenHeight]
@@ -200,6 +202,7 @@ def main():
         # drawing code shd be above
         
         clock.tick(60)
+        await asyncio.sleep(0)
         
         pygame.display.flip()
         
@@ -207,4 +210,4 @@ def main():
 
         
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
