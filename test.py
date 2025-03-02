@@ -9,6 +9,14 @@ blue = (0, 0, 255)
 screenWidth = 800
 screenHeight = 600
 
+filler = random.randint(0, 1)%2
+if filler == 1:
+    player1Color = black
+    player2Color = white
+else:
+    player1Color = white
+    player2Color = black
+
 # speed = int(input(print("input speed: ")))
 speed = 6
 
@@ -32,9 +40,8 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         
         # self.calcGrav()
-        self.rect.x += self.changeX
-        self.rect.y += self.changeY
         
+        self.rect.x += self.changeX
         blockHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
         for block in blockHitList:
             if self.changeX > 0:
@@ -54,15 +61,15 @@ class Player(pygame.sprite.Sprite):
             
             self.changeY = 0
     
-    def calcGrav(self):
-        if self.changeY == 0:
-            self.changeY = 1
-        else:
-            self.changeY += 0.35
+    # def calcGrav(self):
+    #     if self.changeY == 0:
+    #         self.changeY = 1
+    #     else:
+    #         self.changeY += 0.35
     
-        if self.rect.y >= screenHeight - self.rect.height and self.changeY >= 0:
-            self.changeY = 0
-            self.rect.y = screenHeight - self.rect.height
+    #     if self.rect.y >= screenHeight - self.rect.height and self.changeY >= 0:
+    #         self.changeY = 0
+    #         self.rect.y = screenHeight - self.rect.height
         
     def goUp(self):
         # self.rect.y += 2
@@ -126,6 +133,7 @@ class levelOne(Level):
     def __init__(self, player1, player2):
         
         Level.__init__(self, player1)
+        Level.__init__(self, player2)
         
         level = []
         
@@ -228,8 +236,8 @@ def main():
         
         pygame.event.pump()
         
-        player1.update()
-        player2.update()
+        # player1.update()
+        # player2.update()
         activeSpriteList.update()
         currentLevel.update()
         
@@ -241,6 +249,15 @@ def main():
             player1.rect.bottom = screenHeight
         if player1.rect.top < 0:
             player1.rect.top = 0
+            
+        if player2.rect.right > screenWidth:
+            player2.rect.right = screenWidth
+        if player2.rect.left < 0:
+            player2.rect.left = 0
+        if player2.rect.bottom > screenHeight:
+            player2.rect.bottom = screenHeight
+        if player2.rect.top < 0:
+            player2.rect.top = 0
         
         # other drawing code below
         currentLevel.draw(screen)
