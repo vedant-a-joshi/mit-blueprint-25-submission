@@ -8,8 +8,8 @@ red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
 
-screenWidth = 640
-screenHeight = 600
+screenWidth = 600
+screenHeight = 570
 
 touching = [[0,-1],[1,0],[0,1],[-1,0]]
 
@@ -38,8 +38,8 @@ class Player(pygame.sprite.Sprite):
 
         super().__init__()
         
-        width = 32
-        height = 32
+        width = 30
+        height = 30
         self.speed = speed
         self.image = pygame.Surface([width, height])
         
@@ -169,7 +169,7 @@ class Game(object):
                                 count += 2 ** k
                         except:
                             count += 2 ** k
-                    newWall = Wall(j * 32, i * 32 + 120, 32, 32, f"walls/sprite_{count:02d}.png")
+                    newWall = Wall(j * 30, i * 30 + 120, 30, 30, f"walls/sprite_{count:02d}.png")
                     self.wallList.add(newWall)
                 elif (mapArr[i][j] == ' '):
                     count = 0
@@ -181,20 +181,20 @@ class Game(object):
                                 count += 2 ** k
                         except:
                             count += 2 ** k
-                    newGrass = Wall(j * 32, i * 32 + 120, 32, 32, f"grass/sprite_{count:02d}.png")
+                    newGrass = Wall(j * 30, i * 30 + 120, 30, 30, f"grass/sprite_{count:02d}.png")
                     self.decoList.add(newGrass)
 
 def updateSprites(player1, player2):
     if not player1It:
         player1.image = pygame.image.load('Player1NotIt.png')
         player2.image = pygame.image.load('Player2It.png')
-        player1.speed = 4
-        player2.speed = 5
+        player1.speed = 5
+        player2.speed = 6
     else:
         player1.image = pygame.image.load('Player1It.png')
         player2.image = pygame.image.load('Player2NotIt.png')
-        player1.speed = 5
-        player2.speed = 4
+        player1.speed = 6
+        player2.speed = 5
 
 def main():
     FIRST_TO = 3
@@ -214,8 +214,8 @@ def main():
 
     crash_sound = pygame.mixer.Sound("get.mp3")
 
-    pygame.mixer.music.load("bgm.mp3")
-    pygame.mixer.music.play(-1)
+    # pygame.mixer.music.load("bgm.mp3")
+    # pygame.mixer.music.play(-1)
     
     size = [screenWidth, screenHeight]
     screen = pygame.display.set_mode(size)
@@ -230,22 +230,6 @@ def main():
     game = Game(player1, player2)
     
     levels = [
-    GameMap(1, 1, 18, 13,
-"""WWWWWWWWWWWWWWWWWWWW
-W                  W
-W                  W
-W                  W
-W                  W
-W                  W
-W                  W
-W                  W
-W                  W
-W                  W
-W                  W
-W                  W
-W                  W
-W                  W
-WWWWWWWWWWWWWWWWWWWW"""),
     GameMap(1, 1, 18, 13,
 """WWWWWWWWWWWWWWWWWWWW
 W                  W
@@ -275,6 +259,22 @@ W        WW        W
 W        WW    WW  W
 W     WWWWW        W
 W                  W
+W                  W
+W                  W
+WWWWWWWWWWWWWWWWWWWW"""),
+    GameMap(1, 1, 18, 13,
+"""WWWWWWWWWWWWWWWWWWWW
+W                  W
+W                  W
+W     W      W     W
+W     W      W     W
+W     W      W     W
+W                  W
+W                  W
+W                  W
+W     W      W     W
+W     W      W     W
+W     W      W     W
 W                  W
 W                  W
 WWWWWWWWWWWWWWWWWWWW"""),
@@ -309,19 +309,19 @@ WWWWWWWWWWWWWWWWWWWW"""),
         playbtn = pygame.image.load("play.png")
         playbtn = pygame.transform.scale(playbtn, (400, 160))
         playrect = playbtn.get_rect()
-        playrect.center = (320, 200)
+        playrect.center = (300, 200)
         screen.blit(playbtn, playrect)
 
         exitbtn = pygame.image.load("exit.png")
         exitbtn = pygame.transform.scale(exitbtn, (300, 120))
         exitrect = exitbtn.get_rect()
-        exitrect.center = (320, 500)
+        exitrect.center = (300, 500)
         screen.blit(exitbtn, exitrect)
 
         playtext = font4.render("Play", False, (255, 255, 255))
-        playtextrect = playtext.get_rect(center=(320, 200))
+        playtextrect = playtext.get_rect(center=(300, 200))
         exittext = font3.render("Exit", False, (255, 255, 255))
-        exittextrect = exittext.get_rect(center=(320, 500))
+        exittextrect = exittext.get_rect(center=(300, 500))
 
         screen.blit(playtext, playtextrect)
         screen.blit(exittext, exittextrect)
@@ -341,31 +341,43 @@ WWWWWWWWWWWWWWWWWWWW"""),
         while (player1Score < FIRST_TO and player2Score < FIRST_TO):
             randomiseTeams()
             updateSprites(player1, player2)
-            print(player1It)
 
             if player1It:
-                player1.speed = 5
-                player2.speed = 4
-            else: 
-                player1.speed = 4
+                player1.speed = 6
                 player2.speed = 5
+            else: 
+                player1.speed = 5
+                player2.speed = 6
             pygame.display.set_caption(f"FT{FIRST_TO}, {player1Score}:{player2Score}")
             ctime = 0
-            chosen_map_id = random.randrange(0, len(levels))
+            chosen_map_id = 1#random.randrange(0, len(levels))
             chosen_map = levels[chosen_map_id]
             game.loadMap(chosen_map.mapdata)
-            player1.rect.x = chosen_map.player1_xpos * 32
-            player1.rect.y = chosen_map.player1_ypos * 32 + 120
-            player2.rect.x = chosen_map.player2_xpos * 32
-            player2.rect.y = chosen_map.player2_ypos * 32 + 120
-            textbg = Wall(0, 0, 640, 120, "scoreboard.png")
+            player1.rect.x = chosen_map.player1_xpos * 30
+            player1.rect.y = chosen_map.player1_ypos * 30 + 120
+            player2.rect.x = chosen_map.player2_xpos * 30
+            player2.rect.y = chosen_map.player2_ypos * 30 + 120
+            textbg = Wall(0, 0, 600, 120, "scoreboard.png")
             game.decoList.add(textbg)
             while ctime < 3 * 1000:
                 ctime += clock.get_time()
-                timetext = font4.render(f"{ctime}", False, (0, 0, 255))
-                timerect = timetext.get_rect(center=(320, 300))
+                if (ctime <= 0):
+                    break
+                timetext = font4.render(f"{(4000 - ctime) // 1000}", False, (255, 192, 0))
+                timerect = timetext.get_rect(center=(300, 300))
 
+                game.draw(screen)
+                p1score = font2.render(f"{player1Score}", False, (255, 0, 0))
+                p1s_rect = p1score.get_rect(center=(235, 85))
+                p2score = font2.render(f"{player2Score}", False, (0, 0, 255))
+                p2s_rect = p1score.get_rect(midleft=(355, 85))
+                screen.blit(p1score, p1s_rect)
+                screen.blit(p2score, p2s_rect)
                 screen.blit(timetext, timerect)
+                clock.tick(30)
+                pygame.display.flip()
+                activeSpriteList.update()
+                pygame.event.pump()
 
 
             ctime = 0
@@ -433,8 +445,9 @@ WWWWWWWWWWWWWWWWWWWW"""),
                 activeSpriteList.draw(screen)
                 
                 if player1.rect.colliderect(player2.rect) and not collisionOccurred:
-                    updateSprites(player1, player2)
+                    player1It = not player1It
                     crash_sound.play()
+                    updateSprites(player1, player2)
                     
                     collisionOccurred = True
                 elif not player1.rect.colliderect(player2.rect):
@@ -450,11 +463,11 @@ WWWWWWWWWWWWWWWWWWWW"""),
                 sec = ntime // 1000
                 ms = ntime % 1000
                 time_counter = font.render(f"Time remaining: {sec}.{ms:03d}", False, (255, 255, 255))
-                tc_rect = time_counter.get_rect(center=(320, 25))
+                tc_rect = time_counter.get_rect(center=(300, 25))
                 p1score = font2.render(f"{player1Score}", False, (255, 0, 0))
-                p1s_rect = p1score.get_rect(center=(252, 85))
+                p1s_rect = p1score.get_rect(center=(235, 85))
                 p2score = font2.render(f"{player2Score}", False, (0, 0, 255))
-                p2s_rect = p1score.get_rect(midleft=(380, 85))
+                p2s_rect = p1score.get_rect(midleft=(355, 85))
 
                 screen.blit(time_counter, tc_rect)
                 screen.blit(p1score, p1s_rect)
