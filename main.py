@@ -35,18 +35,20 @@ class GameMap:
 class Player(pygame.sprite.Sprite):
     def __init__(self, image1str, image2str, speed, isIt = False):
         self.isIt = isIt
+        self.image1str = image1str
+        self.image2str = image2str
 
         super().__init__()
         
         width = 30
         height = 30
-        self.speed = speed
-        self.image = pygame.Surface([width, height])
-        
-        if (isIt):
-            self.image = pygame.image.load(image1str)
+        self.speed = speed        
+        if (self.isIt):
+            self.image = pygame.image.load(self.image1str)
         else:
-            self.image = pygame.image.load(image2str)
+            self.image = pygame.image.load(self.image2str)
+        
+        self.image = pygame.transform.scale(self.image, (width, height))
         
         self.rect = self.image.get_rect()
         
@@ -78,6 +80,13 @@ class Player(pygame.sprite.Sprite):
                 self.rect.top = block.rect.bottom
             
             self.changeY = 0
+    
+        if (self.isIt):
+            self.image = pygame.image.load(self.image1str)
+        else:
+            self.image = pygame.image.load(self.image2str)
+        
+        self.image = pygame.transform.scale(self.image, (30, 30))
     
     # def calcGrav(self):
     #     if self.changeY == 0:
@@ -184,18 +193,6 @@ class Game(object):
                     newGrass = Wall(j * 30, i * 30 + 120, 30, 30, f"grass/sprite_{count:02d}.png")
                     self.decoList.add(newGrass)
 
-def updateSprites(player1, player2):
-    if not player1It:
-        player1.image = pygame.image.load('Player1NotIt.png')
-        player2.image = pygame.image.load('Player2It.png')
-        player1.speed = 5
-        player2.speed = 6
-    else:
-        player1.image = pygame.image.load('Player1It.png')
-        player2.image = pygame.image.load('Player2NotIt.png')
-        player1.speed = 6
-        player2.speed = 5
-
 def main():
     FIRST_TO = 3
     TIME_LIMIT = 30 * 1000
@@ -224,8 +221,8 @@ def main():
     # bg = pygame.image.load("river.png")
     # bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
     
-    player1 = Player("Player1It.png", "Player1NotIt.png", 4, isIt = player1It)
-    player2 = Player("Player2It.png", "Player2NotIt.png", 4, isIt = not player1It)
+    player1 = Player("players/sprite_1.png", "players/sprite_0.png", 4, isIt = player1It)
+    player2 = Player("players/sprite_3.png", "players/sprite_2.png", 4, isIt = not player1It)
 
     game = Game(player1, player2)
     
@@ -340,7 +337,8 @@ WWWWWWWWWWWWWWWWWWWW"""),
         ctime = 0
         while (player1Score < FIRST_TO and player2Score < FIRST_TO):
             randomiseTeams()
-            updateSprites(player1, player2)
+            player1.isIt = player1It
+            player2.isIt = not player1It
 
             if player1It:
                 player1.speed = 6
@@ -447,7 +445,15 @@ WWWWWWWWWWWWWWWWWWWW"""),
                 if player1.rect.colliderect(player2.rect) and not collisionOccurred:
                     player1It = not player1It
                     crash_sound.play()
-                    updateSprites(player1, player2)
+                    player1.isIt = player1It
+                    player2.isIt = not player1It
+
+                    if player1It:
+                        player1.speed = 6
+                        player2.speed = 5
+                    else: 
+                        player1.speed = 5
+                        player2.speed = 6
                     
                     collisionOccurred = True
                 elif not player1.rect.colliderect(player2.rect):
