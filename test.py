@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, time
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -158,6 +158,9 @@ class levelOne(Level):
             self.platformList.add(block)
 
 def main():
+    global player1It
+    global player1Color
+    global player2Color
     pygame.init()
     
     size = [screenWidth, screenHeight]
@@ -182,6 +185,8 @@ def main():
     player1.rect.x = 80
     player1.rect.y = screenHeight - player1.rect.height
     activeSpriteList.add(player1)
+    
+    time.sleep(5)
     
     player2.rect.x = 80
     player2.rect.y = screenWidth - player2.rect.width
@@ -265,7 +270,7 @@ def main():
         # other drawing code below
         currentLevel.draw(screen)
         activeSpriteList.draw(screen)
-        if (player1.rect.bottom >= player2.rect.bottom or 
+        if (player1.rect.bottom >= player2.rect.top or 
             player1.rect.top <= player2.rect.bottom or 
             player1.rect.right >= player2.rect.left or
             player1.rect.left <= player2.rect.right):
