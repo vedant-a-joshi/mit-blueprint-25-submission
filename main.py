@@ -1,6 +1,8 @@
 import pygame, random, sys, time, threading
 from interruptingcow import timeout
 from dataclasses import dataclass
+from uuid import getnode as get_mac
+import networkzero as nw0
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -16,6 +18,12 @@ touching = [[0,-1],[1,0],[0,1],[-1,0]]
 itcolor = black
 runcolor = white
 player1It = False
+
+ADDRESS = None
+SERVER = None
+CREATELOBBY_STR = "_POTATO"
+MAC_ADDR = get_mac()
+
 
 def randomiseTeams():
     global player1It
@@ -196,6 +204,10 @@ class Game(object):
 def main():
     FIRST_TO = 3
     TIME_LIMIT = 30 * 1000
+    global ADDRESS
+    global SERVER
+    global CREATELOBBY_STR
+    global MAC_ADDR
 
     pygame.font.init()
     font = pygame.font.Font("m6x11.ttf", 35)
@@ -296,6 +308,7 @@ WWWWWWWWWWWWWWWWWWWW"""),
     
     clock = pygame.time.Clock()
     pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
+    isServer = False
     while (not done):
         player1Score = 0
         player2Score = 0
@@ -309,6 +322,18 @@ WWWWWWWWWWWWWWWWWWWW"""),
         playrect.center = (300, 200)
         screen.blit(playbtn, playrect)
 
+        multibtn = pygame.image.load("play.png")
+        multibtn = pygame.transform.scale(multibtn, (200, 80))
+        multirect = playbtn.get_rect()
+        multirect.center = (300, 360)
+        screen.blit(multibtn, multirect)
+
+        multibtn2 = pygame.image.load("play.png")
+        multibtn2 = pygame.transform.scale(multibtn2, (200, 80))
+        multirect2 = playbtn.get_rect()
+        multirect2.center = (500, 360)
+        screen.blit(multibtn2, multirect2)
+
         exitbtn = pygame.image.load("exit.png")
         exitbtn = pygame.transform.scale(exitbtn, (300, 120))
         exitrect = exitbtn.get_rect()
@@ -317,10 +342,16 @@ WWWWWWWWWWWWWWWWWWWW"""),
 
         playtext = font4.render("Play", False, (255, 255, 255))
         playtextrect = playtext.get_rect(center=(300, 200))
+        multitext = font.render("Multiplayer", False, (255, 255, 255))
+        multitextrect = multitext.get_rect(center=(200, 320))
+        multitext2 = font.render("Listen", False, (255, 255, 255))
+        multitextrect2 = multitext2.get_rect(center=(400, 320))
         exittext = font3.render("Exit", False, (255, 255, 255))
         exittextrect = exittext.get_rect(center=(300, 500))
 
         screen.blit(playtext, playtextrect)
+        screen.blit(multitext, multitextrect)
+        screen.blit(multitext2, multitextrect2)
         screen.blit(exittext, exittextrect)
         while not start:
             for event in pygame.event.get():
@@ -329,8 +360,22 @@ WWWWWWWWWWWWWWWWWWWW"""),
                     if exitrect.collidepoint(mouse):
                         pygame.quit()
                         return
-                    if (playrect.collidepoint(mouse)):
+                    elif (playrect.collidepoint(mouse)):
                         start = True
+                    elif (multirect.collidepoint(mouse)):
+                        isServer = True
+                        ADDRESS = nw0.advertise(CREATELOBBY_STR)
+                        test = nw0.wait_for_message_from(ADDRESS)
+                        print(test)
+                        nw0.send_reply_to(ADDRESS, MAC_ADDR)
+                    elif (multirect2.collidepoint(mouse)):
+                        isServer = False
+                        SERVER = nw0.discover(CREATELOBBY_STR, 10)
+                        if (SERVER != None):
+                            reply = nw0.send_message_to(SERVER, MAC_ADDR)
+                            print(reply)
+                        test = nw0.wait_for_message_from(ADDRESS)
+                        print(test)
             pygame.event.pump()
             clock.tick(30)
             pygame.display.flip()
