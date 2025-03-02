@@ -1,5 +1,6 @@
 import pygame, random, sys, time, threading
 from interruptingcow import timeout
+from dataclasses import dataclass
 
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -8,7 +9,7 @@ green = (0, 255, 0)
 blue = (0, 0, 255)
 
 screenWidth = 640
-screenHeight = 480
+screenHeight = 600
 
 touching = [[0,-1],[1,0],[0,1],[-1,0]]
 
@@ -16,6 +17,8 @@ itcolor = black
 runcolor = white
 player1It = False
 filler = random.randint(0, 1)%2
+player1Score = 0
+player2Score = 0
 if filler == 1:
     player1Color = itcolor
     player2Color = runcolor
@@ -27,6 +30,14 @@ else:
 
 # speed = int(input(print("input speed: ")))
 speed = 4
+
+@dataclass
+class GameMap:
+    player1_xpos: int
+    player1_ypos: int
+    player2_xpos: int
+    player2_ypos: int
+    mapdata: str
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, image1str, image2str, isIt = False):
@@ -118,7 +129,7 @@ class Wall(pygame.sprite.Sprite):
         super().__init__()
         
         self.image = pygame.image.load(image)
-        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = xpos
         self.rect.y = ypos
@@ -143,6 +154,8 @@ class Game(object):
     def loadMap(self, mapData):
         for i in self.wallList:
             i.kill()
+        for i in self.decoList:
+            i.kill()
         mapArr = mapData.split("\n")
         for i in range(15):
             for j in range(20):
@@ -157,7 +170,7 @@ class Game(object):
                         except:
                             count += 2 ** k
                     print(f"({i},{j})=>{count}")
-                    newWall = Wall(j * 32, i * 32, 32, 32, f"walls/sprite_{count:02d}.png")
+                    newWall = Wall(j * 32, i * 32 + 120, 32, 32, f"walls/sprite_{count:02d}.png")
                     self.wallList.add(newWall)
                 elif (mapArr[i][j] == ' '):
                     count = 0
@@ -169,16 +182,19 @@ class Game(object):
                                 count += 2 ** k
                         except:
                             count += 2 ** k
-                    newGrass = Wall(j * 32, i * 32, 32, 32, f"grass/sprite_{count:02d}.png")
+                    newGrass = Wall(j * 32, i * 32 + 120, 32, 32, f"grass/sprite_{count:02d}.png")
                     self.decoList.add(newGrass)
 
-
 def main():
+    FIRST_TO = 3
     pygame.font.init()
-    font = pygame.font.Font("m6x11.ttf", 30)
+    font = pygame.font.Font("m6x11.ttf", 40)
+    font2 = pygame.font.Font("m6x11.ttf", 60)
     global player1It
     global player1Color
     global player2Color
+    global player1Score
+    global player2Score
     pygame.init()
     
     size = [screenWidth, screenHeight]
@@ -188,7 +204,6 @@ def main():
     # bg = pygame.image.load("river.png")
     # bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
 
-    
     pygame.display.set_caption("Tag")
     
     player1 = Player("Player1It.png", "Player1NotIt.png", isIt = player1It)
@@ -197,24 +212,39 @@ def main():
     game = Game(player1, player2)
     
     levels = [
-        """WWWWWWWWWWWWWWWWWWWW
-W                  W
-W  W W             W
-W  W W             W
-W  W WWW           W
-W  W               W
-W  WWWWWW          W
+    GameMap(1, 1, 18, 13,
+"""WWWWWWWWWWWWWWWWWWWW
 W                  W
 W                  W
 W                  W
-W          WWWWWWW W
-W          WWWWWWW W
-W          WWWWWWW W
 W                  W
-WWWWWWWWWWWWWWWWWWWW"""
+W                  W
+W                  W
+W                  W
+W                  W
+W                  W
+W                  W
+W                  W
+W                  W
+W                  W
+WWWWWWWWWWWWWWWWWWWW"""),
+    GameMap(1, 1, 18, 13,
+"""WWWWWWWWWWWWWWWWWWWW
+W                  W
+W                  W
+W                  W
+W        WW        W
+W        WW        W
+W        WW        W
+W        WW        W
+W        WW        W
+W        WW        W
+W        WW        W
+W                  W
+W                  W
+W                  W
+WWWWWWWWWWWWWWWWWWWW"""),
     ]
-
-    game.loadMap(levels[0])
 
     # currentLevelNumber = 0
     # currentLevel = levelList[currentLevelNumber]
@@ -223,12 +253,8 @@ WWWWWWWWWWWWWWWWWWWW"""
     player1.level = game
     player2.level = game
     
-    player1.rect.x = 80
-    player1.rect.y = 80
     activeSpriteList.add(player1)
     
-    player2.rect.x = 400
-    player2.rect.y = 400
     activeSpriteList.add(player2)
     
     done = False
@@ -239,104 +265,123 @@ WWWWWWWWWWWWWWWWWWWW"""
     
     clock = pygame.time.Clock()
     pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
-
-    ctime = 0
     
-    while (not done and ctime < 30000):
+    while (player1Score < FIRST_TO and player2Score < FIRST_TO):
+        ctime = 0
+        chosen_map_id = random.randrange(0, len(levels))
+        chosen_map = levels[chosen_map_id]
+        game.loadMap(chosen_map.mapdata)
+        player1.rect.x = chosen_map.player1_xpos * 32
+        player1.rect.y = chosen_map.player1_ypos * 32 + 120
+        player2.rect.x = chosen_map.player2_xpos * 32
+        player2.rect.y = chosen_map.player2_ypos * 32 + 120
+        textbg = Wall(0, 0, 640, 120, f"walls/sprite_15.png")
+        game.decoList.add(textbg)
+        while (not done and ctime < 30000):
 
-        ctime += clock.get_time()
-        print(ctime)
+            ctime += clock.get_time()
+            print(ctime)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                done = True
-                pygame.quit()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    done = True
+                    pygame.quit()
 
-        player1.changeX = 0
-        player1.changeY = 0
-        player2.changeX = 0
-        player2.changeY = 0
+            player1.changeX = 0
+            player1.changeY = 0
+            player2.changeX = 0
+            player2.changeY = 0
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            player1.goLeft()
-        if keys[pygame.K_RIGHT]:
-            player1.goRight()
-        if keys[pygame.K_DOWN]:
-            player1.goDown()
-        if keys[pygame.K_UP]:
-            player1.goUp()
-        
-        if keys[pygame.K_a]:
-            player2.goLeft()
-        if keys[pygame.K_d]:
-            player2.goRight()
-        if keys[pygame.K_s]:
-            player2.goDown()
-        if keys[pygame.K_w]:
-            player2.goUp()
-        
-        pygame.event.pump()
-        
-        # player1.update()
-        # player2.update()
-        activeSpriteList.update()
-        # currentLevel.update()
-        game.update()
-        
-        if player1.rect.right > screenWidth:
-            player1.rect.right = screenWidth
-        if player1.rect.left < 0:
-            player1.rect.left = 0
-        if player1.rect.bottom > screenHeight:
-            player1.rect.bottom = screenHeight
-        if player1.rect.top < 0:
-            player1.rect.top = 0
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                player1.goLeft()
+            if keys[pygame.K_RIGHT]:
+                player1.goRight()
+            if keys[pygame.K_DOWN]:
+                player1.goDown()
+            if keys[pygame.K_UP]:
+                player1.goUp()
             
-        if player2.rect.right > screenWidth:
-            player2.rect.right = screenWidth
-        if player2.rect.left < 0:
-            player2.rect.left = 0
-        if player2.rect.bottom > screenHeight:
-            player2.rect.bottom = screenHeight
-        if player2.rect.top < 0:
-            player2.rect.top = 0
-        
-        # other drawing code below
-        game.draw(screen)
-        activeSpriteList.draw(screen)
-        
-        if player1.rect.colliderect(player2.rect) and not collisionOccurred:
-            if player1It:
-                player1It = False
-                player1.image = pygame.image.load('Player1NotIt.png')
-                player2.image = pygame.image.load('Player2It.png')
-                # player1.image.fill(runcolor)
-                # player2.image.fill(itcolor)
-            else:
-                player1It = True
-                player1.image = pygame.image.load('Player1It.png')
-                player2.image = pygame.image.load('Player2NotIt.png')
-                # player1.image.fill(itcolor)
-                # player2.image.fill(runcolor)
+            if keys[pygame.K_a]:
+                player2.goLeft()
+            if keys[pygame.K_d]:
+                player2.goRight()
+            if keys[pygame.K_s]:
+                player2.goDown()
+            if keys[pygame.K_w]:
+                player2.goUp()
             
-            collisionOccurred = True
-        elif not player1.rect.colliderect(player2.rect):
-            collisionOccurred = False
+            pygame.event.pump()
+            
+            # player1.update()
+            # player2.update()
+            activeSpriteList.update()
+            # currentLevel.update()
+            game.update()
+            
+            if player1.rect.right > screenWidth:
+                player1.rect.right = screenWidth
+            if player1.rect.left < 0:
+                player1.rect.left = 0
+            if player1.rect.bottom > screenHeight:
+                player1.rect.bottom = screenHeight
+            if player1.rect.top < 0:
+                player1.rect.top = 0
+                
+            if player2.rect.right > screenWidth:
+                player2.rect.right = screenWidth
+            if player2.rect.left < 0:
+                player2.rect.left = 0
+            if player2.rect.bottom > screenHeight:
+                player2.rect.bottom = screenHeight
+            if player2.rect.top < 0:
+                player2.rect.top = 0
+            
+            # other drawing code below
+            game.draw(screen)
+            activeSpriteList.draw(screen)
+            
+            if player1.rect.colliderect(player2.rect) and not collisionOccurred:
+                if player1It:
+                    player1It = False
+                    player1.image = pygame.image.load('Player1NotIt.png')
+                    player2.image = pygame.image.load('Player2It.png')
+                    # player1.image.fill(runcolor)
+                    # player2.image.fill(itcolor)
+                else:
+                    player1It = True
+                    player1.image = pygame.image.load('Player1It.png')
+                    player2.image = pygame.image.load('Player2NotIt.png')
+                    # player1.image.fill(itcolor)
+                    # player2.image.fill(runcolor)
+                
+                collisionOccurred = True
+            elif not player1.rect.colliderect(player2.rect):
+                collisionOccurred = False
+            
+            # drawing code shd be above
+            
+            clock.tick(60)
+
+            ntime = 30000 - ctime
+            sec = ntime // 1000
+            ms = ntime % 1000
+            time_counter = font.render(f"Time remaining: {sec}.{ms:03d}", False, (255, 255, 255))
+            tc_rect = time_counter.get_rect(center=(320, 30))
+            p1score = font2.render(f"{player1Score}", False, (255, 0, 0))
+            p1s_rect = p1score.get_rect(midright=(300,80))
+            p2score = font2.render(f"{player2Score}", False, (0, 0, 255))
+            p2s_rect = p1score.get_rect(midleft=(340,80))
+
+            screen.blit(time_counter, tc_rect)
+            screen.blit(p1score, p1s_rect)
+            screen.blit(p2score, p2s_rect)
+
+            pygame.display.flip()
+            # print(clock)
         
-        # drawing code shd be above
-        
-        clock.tick(60)
-
-        ntime = 30000 - ctime
-        sec = ntime // 1000
-        ms = ntime % 1000
-        text_surface = font.render(f"Time remaining: {sec}.{ms}", False, (0, 0, 0))
-
-        screen.blit(text_surface, (0,0))
-
-        pygame.display.flip()
-        # print(clock)
+        player1Score += not player1It
+        player2Score += player1It
         
     pygame.quit()
 
