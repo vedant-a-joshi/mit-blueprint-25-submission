@@ -1,5 +1,5 @@
 import pygame, random, sys
-from interruptingcow from timeout
+from interruptingcow import timeout
 
 black = (0, 0, 0)
 white = (255, 255, 255)
