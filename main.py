@@ -1,4 +1,4 @@
-import pygame, random, sys, time
+import pygame, random, sys, time, threading
 from interruptingcow import timeout
 
 black = (0, 0, 0)
@@ -174,7 +174,8 @@ class Game(object):
 
 
 def main():
-
+    pygame.font.init()
+    font = pygame.font.Font("m6x11.ttf", 30)
     global player1It
     global player1Color
     global player2Color
@@ -232,66 +233,30 @@ WWWWWWWWWWWWWWWWWWWW"""
     
     done = False
     collisionOccurred = False
-    timeoutStart = time.time()
-    timeout = 5
+
+    # timeoutStart = time.time()
+    # timeout = 5
     
     clock = pygame.time.Clock()
     pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
-    
-    while (not done or time.time() < timeout + timeoutStart):
-        
-        # screen.blit(bg, (0, 0))
 
-        # events = pygame.event.get()
-        # for event in events:
-        #     if event.type == pygame.QUIT:
-        #         done = True
-                
-        #     if event.type == pygame.KEYDOWN:
-        #         if event.key == pygame.K_x:
-        #             levelOne.loadMap()
-                
-        #         if event.key == pygame.K_LEFT:
-        #             player1.goLeft()
-        #         elif event.key == pygame.K_RIGHT:
-        #             player1.goRight()
-        #         if event.key == pygame.K_UP:
-        #             player1.goUp()
-        #         elif event.key == pygame.K_DOWN:
-        #             player1.goDown()
-                    
-        #         if event.key == pygame.K_a:
-        #             player2.goLeft()
-        #         elif event.key == pygame.K_d:
-        #             player2.goRight()
-        #         if event.key == pygame.K_w:
-        #             player2.goUp()
-        #         elif event.key == pygame.K_s:
-        #             player2.goDown()
-            
-        #     if event.type == pygame.KEYUP:
-        #         if event.key == pygame.K_LEFT:
-        #             player1.stopHorizontal()
-        #         if event.key == pygame.K_RIGHT:  
-        #             player1.stopHorizontal()
-        #         if event.key == pygame.K_UP:
-        #             player1.stopVertical()
-        #         if event.key == pygame.K_DOWN:
-        #             player1.stopVertical()
-                
-        #         if event.key == pygame.K_a:
-        #             player2.stopHorizontal()
-        #         if event.key == pygame.K_d:  
-        #             player2.stopHorizontal()
-        #         if event.key == pygame.K_w:
-        #             player2.stopVertical()
-        #         if event.key == pygame.K_s:
-        #             player2.stopVertical()
+    ctime = 0
+    
+    while (not done and ctime < 30000):
+
+        ctime += clock.get_time()
+        print(ctime)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+                pygame.quit()
 
         player1.changeX = 0
         player1.changeY = 0
         player2.changeX = 0
         player2.changeY = 0
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             player1.goLeft()
@@ -362,6 +327,14 @@ WWWWWWWWWWWWWWWWWWWW"""
         # drawing code shd be above
         
         clock.tick(60)
+
+        ntime = 30000 - ctime
+        sec = ntime // 1000
+        ms = ntime % 1000
+        text_surface = font.render(f"Time remaining: {sec}.{ms}", False, (0, 0, 0))
+
+        screen.blit(text_surface, (0,0))
+
         pygame.display.flip()
         # print(clock)
         
