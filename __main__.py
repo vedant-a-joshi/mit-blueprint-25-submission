@@ -303,6 +303,38 @@ W          W       W
 W         W        W
 W                  W
 WWWWWWWWWWWWWWWWWWWW"""),
+    GameMap(1, 1, 18, 13,
+"""WWWWWWWWWWWWWWWWWWWW
+W                  W
+W                  W
+W    WWW       W   W
+W       W          W
+W        W     W   W
+W                  W
+W        w     W   W
+W                  W
+W       W          W
+W     W    W   W   W
+W     W            W
+W     W    W    w  W
+W                  W
+WWWWWWWWWWWWWWWWWWWW"""),
+    GameMap(1, 1, 18, 13,
+"""WWWWWWWWWWWWWWWWWWWW
+W                  W
+W                  W
+W                  W
+W    W  W  W  W    W
+W                  W
+W                  W
+W                  W
+W    W  W  W  W    W
+W                  W
+W                  W
+W                  W
+W    W  W  W  W    W
+W                  W
+WWWWWWWWWWWWWWWWWWWW"""),
     ]
 
     # currentLevelNumber = 0
@@ -409,7 +441,7 @@ WWWWWWWWWWWWWWWWWWWW"""),
                 player2.speed = 6
             pygame.display.set_caption(f"FT{FIRST_TO}, {player1Score}:{player2Score}")
             ctime = 0
-            chosen_map_id = 1#random.randrange(0, len(levels))
+            chosen_map_id = random.randrange(0, len(levels))
             chosen_map = levels[chosen_map_id]
             game.loadMap(chosen_map.mapdata)
             player1.rect.x = chosen_map.player1_xpos * 30
