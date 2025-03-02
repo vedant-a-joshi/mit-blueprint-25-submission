@@ -9,7 +9,7 @@ blue = (0, 0, 255)
 screenWidth = 800
 screenHeight = 600
 
-class player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):
     
     def __init__(self):
         super().__init__()
@@ -38,7 +38,7 @@ class player(pygame.sprite.Sprite):
             elif self.changeX < 0:
                 self.rect.left = block.rect.right
         
-        self.rect.y += self.change.y
+        self.rect.y += self.changeY
         blockHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
         for block in blockHitList:
             if self.changeY > 0:
@@ -60,11 +60,11 @@ class player(pygame.sprite.Sprite):
         
     def jump(self):
         self.rect.y += 2
-        platformHitList = pygame.sprite.spritecollide(self, self.level.platformList)
+        platformHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
         self.rect.y -= 2
         
         if len(platformHitList) > 0 or self.rect.bottom >= screenHeight:
-            self.changeY -= 10
+            self.changeY -= 20
     
     def goLeft(self):
         self.changeX -= 6
@@ -74,6 +74,16 @@ class player(pygame.sprite.Sprite):
     
     def stop(self):
         self.changeX = 0
+        
+class Platform(pygame.sprite.Sprite):
+    
+    def __init__(self, width, height):
+        super().__init__()
+        
+        self.image = pygame.Surface([width, height])
+        self.image.fill(green)
+        
+        self.rect = self.image.get_rect()
 
 class Level(object):
     
@@ -176,5 +186,8 @@ def main():
         
         pygame.display.flip()
         
+    pygame.quit()
+
         
-        
+if __name__ == "__main__":
+    main()        
