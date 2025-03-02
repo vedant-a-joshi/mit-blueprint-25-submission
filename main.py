@@ -25,9 +25,10 @@ else:
 # speed = int(input(print("input speed: ")))
 speed = 6
 
-class PlayerOne(pygame.sprite.Sprite):
-    
-    def __init__(self, color, isIt = False):
+class Player(pygame.sprite.Sprite):
+    def __init__(self, image1str, image2str, isIt = False):
+        self.isIt = isIt
+
         super().__init__()
         
         width = 32
@@ -35,9 +36,9 @@ class PlayerOne(pygame.sprite.Sprite):
         self.image = pygame.Surface([width, height])
         
         if (isIt):
-            self.image = pygame.image.load('Player1It.png')
+            self.image = pygame.image.load(image1str)
         else:
-            self.image = pygame.image.load('Player1NotIt.png')
+            self.image = pygame.image.load(image2str)
         
         self.rect = self.image.get_rect()
         
@@ -108,89 +109,6 @@ class PlayerOne(pygame.sprite.Sprite):
     #     self.changeY = 0
     #     self.changeX = 0
 
-class PlayerTwo(pygame.sprite.Sprite):
-    
-    def __init__(self, color, isIt = False):
-        super().__init__()
-        
-        width = 32
-        height = 32
-        self.image = pygame.Surface([width, height])
-        
-        if (isIt):
-            self.image = pygame.image.load('Player2It.png')
-        else:
-            self.image = pygame.image.load('Player2NotIt.png')
-        
-        self.rect = self.image.get_rect()
-        
-        self.changeX = 0
-        self.changeY = 0
-        
-        self.level = None
-        
-    def update(self):
-        
-        # self.calcGrav()
-        
-        self.rect.x += self.changeX
-        blockHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
-        for block in blockHitList:
-            if self.changeX > 0:
-                self.rect.right = block.rect.left
-            elif self.changeX < 0:
-                self.rect.left = block.rect.right
-                
-            self.changeX = 0
-        
-        self.rect.y += self.changeY
-        blockHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
-        for block in blockHitList:
-            if self.changeY > 0:
-                self.rect.bottom = block.rect.top
-            elif self.changeY < 0:
-                self.rect.top = block.rect.bottom
-            
-            self.changeY = 0
-    
-    # def calcGrav(self):
-    #     if self.changeY == 0:
-    #         self.changeY = 1
-    #     else:
-    #         self.changeY += 0.35
-    
-    #     if self.rect.y >= screenHeight - self.rect.height and self.changeY >= 0:
-    #         self.changeY = 0
-    #         self.rect.y = screenHeight - self.rect.height
-        
-    def goUp(self):
-        # self.rect.y += 2
-        # platformHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
-        # self.rect.y -= 2
-        
-        # if len(platformHitList) > 0 or self.rect.bottom >= screenHeight:
-        #     self.changeY -= 10
-        self.changeY -= speed
-    
-    def goDown(self):
-        self.changeY += speed
-    
-    def goLeft(self):
-        self.changeX -= speed
-    
-    def goRight(self):
-        self.changeX += speed
-    
-    def stopHorizontal(self):
-        self.changeX = 0
-    
-    def stopVertical(self):
-        self.changeY = 0
-        
-    # def stop(self):
-    #     self.changeY = 0
-    #     self.changeX = 0
-        
 class Platform(pygame.sprite.Sprite):
     
     def __init__(self, width, height):
@@ -200,6 +118,7 @@ class Platform(pygame.sprite.Sprite):
         self.image.fill(green)
         
         self.rect = self.image.get_rect()
+    
 
 class Level(object):
     
@@ -219,6 +138,14 @@ class Level(object):
         
         self.platformList.draw(screen)
         self.enemyList.draw(screen)
+    
+    def loadMap(self, mapData):
+        for i in self.platformList:
+            i.kill()
+        # for i in mapData:
+        #     for j in i:
+        #         if (j == 'W'):
+
         
 class levelOne(Level):
     
@@ -226,7 +153,7 @@ class levelOne(Level):
         
         Level.__init__(self, player1)
         Level.__init__(self, player2)
-        
+
         level = []
         
         for i in range(random.randint(2, 6)):
@@ -241,6 +168,7 @@ class levelOne(Level):
             self.platformList.add(block)
 
 def main():
+
     global player1It
     global player1Color
     global player2Color
@@ -250,13 +178,13 @@ def main():
     screen = pygame.display.set_mode(size)
     screen.set_alpha(None)
 
-    bg = pygame.image.load("rieverbg.png")
+    bg = pygame.image.load("Player1It.png")
     bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
     
     pygame.display.set_caption("Tag")
     
-    player1 = PlayerOne(player1Color, isIt = player1It)
-    player2 = PlayerTwo(player2Color, isIt = not player1It)
+    player1 = Player("Player1It.png", "Player1NotIt.png", isIt = player1It)
+    player2 = Player("Player2It.png", "Player2NotIt.png", isIt = not player1It)
     
     levelList = []
     levelList.append(levelOne(player1, player2))
@@ -292,6 +220,8 @@ def main():
                 done = True
                 
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_x:
+                    levelOne.loadMap()
                 if event.key == pygame.K_LEFT:
                     player1.goLeft()
                 if event.key == pygame.K_RIGHT:
