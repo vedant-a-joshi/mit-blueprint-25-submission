@@ -25,15 +25,102 @@ else:
 # speed = int(input(print("input speed: ")))
 speed = 6
 
-class Player(pygame.sprite.Sprite):
+class PlayerOne(pygame.sprite.Sprite):
     
-    def __init__(self, color):
+    def __init__(self, color, isIt = False):
         super().__init__()
         
-        width = 60
-        height = 60
+        width = 32
+        height = 32
         self.image = pygame.Surface([width, height])
-        self.image.fill(color)
+        
+        if (isIt):
+            self.image = pygame.image.load('Player1It.png')
+        else:
+            self.image = pygame.image.load('Player1NotIt.png')
+        
+        self.rect = self.image.get_rect()
+        
+        self.changeX = 0
+        self.changeY = 0
+        
+        self.level = None
+        
+    def update(self):
+        
+        # self.calcGrav()
+        
+        self.rect.x += self.changeX
+        blockHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
+        for block in blockHitList:
+            if self.changeX > 0:
+                self.rect.right = block.rect.left
+            elif self.changeX < 0:
+                self.rect.left = block.rect.right
+                
+            self.changeX = 0
+        
+        self.rect.y += self.changeY
+        blockHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
+        for block in blockHitList:
+            if self.changeY > 0:
+                self.rect.bottom = block.rect.top
+            elif self.changeY < 0:
+                self.rect.top = block.rect.bottom
+            
+            self.changeY = 0
+    
+    # def calcGrav(self):
+    #     if self.changeY == 0:
+    #         self.changeY = 1
+    #     else:
+    #         self.changeY += 0.35
+    
+    #     if self.rect.y >= screenHeight - self.rect.height and self.changeY >= 0:
+    #         self.changeY = 0
+    #         self.rect.y = screenHeight - self.rect.height
+        
+    def goUp(self):
+        # self.rect.y += 2
+        # platformHitList = pygame.sprite.spritecollide(self, self.level.platformList, False)
+        # self.rect.y -= 2
+        
+        # if len(platformHitList) > 0 or self.rect.bottom >= screenHeight:
+        #     self.changeY -= 10
+        self.changeY -= speed
+    
+    def goDown(self):
+        self.changeY += speed
+    
+    def goLeft(self):
+        self.changeX -= speed
+    
+    def goRight(self):
+        self.changeX += speed
+    
+    def stopHorizontal(self):
+        self.changeX = 0
+    
+    def stopVertical(self):
+        self.changeY = 0
+        
+    # def stop(self):
+    #     self.changeY = 0
+    #     self.changeX = 0
+
+class PlayerTwo(pygame.sprite.Sprite):
+    
+    def __init__(self, color, isIt = False):
+        super().__init__()
+        
+        width = 32
+        height = 32
+        self.image = pygame.Surface([width, height])
+        
+        if (isIt):
+            self.image = pygame.image.load('Player2It.png')
+        else:
+            self.image = pygame.image.load('Player2NotIt.png')
         
         self.rect = self.image.get_rect()
         
@@ -146,12 +233,6 @@ class levelOne(Level):
             newBlock = [40, 40, random.randint(0, 76) * 10, random.randint(0, 56) * 10]
             level.append(newBlock)
         
-        # width, height, x, y
-        # level = [[30, 30, random.randint(0, 79) * 10, random.randint(0, 79) * 10],
-        #          [210, 70, 200, 400],
-        #          [210, 70, 600, 300],
-        #          ]
-        
         for platform in level:
             block = Platform(platform[0], platform[1])
             block.rect.x = platform[2]
@@ -171,8 +252,8 @@ def main():
     
     pygame.display.set_caption("Tag")
     
-    player1 = Player(player1Color)
-    player2 = Player(player2Color)
+    player1 = PlayerOne(player1Color, isIt = player1It)
+    player2 = PlayerTwo(player2Color, isIt = not player1It)
     
     levelList = []
     levelList.append(levelOne(player1, player2))
@@ -267,8 +348,6 @@ def main():
             player2.rect.bottom = screenHeight
         if player2.rect.top < 0:
             player2.rect.top = 0
-            
-        
         
         # other drawing code below
         currentLevel.draw(screen)
@@ -277,12 +356,16 @@ def main():
         if player1.rect.colliderect(player2.rect) and not collisionOccurred:
             if player1It:
                 player1It = False
-                player1.image.fill(runcolor)
-                player2.image.fill(itcolor)
+                player1.image = pygame.image.load('Player1NotIt.png')
+                player2.image = pygame.image.load('Player2It.png')
+                # player1.image.fill(runcolor)
+                # player2.image.fill(itcolor)
             else:
                 player1It = True
-                player1.image.fill(itcolor)
-                player2.image.fill(runcolor)
+                player1.image = pygame.image.load('Player1It.png')
+                player2.image = pygame.image.load('Player2NotIt.png')
+                # player1.image.fill(itcolor)
+                # player2.image.fill(runcolor)
             
             collisionOccurred = True
         elif not player1.rect.colliderect(player2.rect):
@@ -292,6 +375,7 @@ def main():
         
         clock.tick(60)
         pygame.display.flip()
+        print(clock)
         
     pygame.quit()
 
